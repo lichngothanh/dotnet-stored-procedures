@@ -14,4 +14,11 @@
     <Folder Include="Controllers\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Application\Application.csproj" />
+    <ProjectReference Include="..\Infrastructure.Ado\Infrastructure.Ado.csproj" />
+    <ProjectReference Include="..\Infrastructure.Dapper\Infrastructure.Dapper.csproj" />
+    <ProjectReference Include="..\Infrastructure.EfCore\Infrastructure.EfCore.csproj" />
+  </ItemGroup>
+
 </Project>
