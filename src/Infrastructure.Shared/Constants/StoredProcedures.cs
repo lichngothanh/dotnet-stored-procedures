@@ -4,7 +4,10 @@ public static class StoredProcedures
 {
     public static class SuperHero
     {
-        public const string GetByName = "sp_SuperHero_GetByName";
-        public const string GetById = "GetById";
+        public const string GetById = "sp_SuperHero_GetById";
+        public const string GetAll = "sp_SuperHero_GetAll";
+        public const string Insert = "sp_SuperHero_Insert";
+        public const string Update = "sp_SuperHero_Update";
+        public const string AssignToTeam = "sp_SuperHero_AssignToTeam";
     }
 }

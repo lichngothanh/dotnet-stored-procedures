@@ -5,7 +5,7 @@ namespace Domain.SuperHeroes;
 
 public sealed class PowerLevel : ValueObject
 {
-    private int Value { get; }
+    public int Value { get; }
 
     private PowerLevel(int value)
     {

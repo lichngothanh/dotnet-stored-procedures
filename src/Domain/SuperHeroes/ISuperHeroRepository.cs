@@ -4,7 +4,7 @@ namespace Domain.SuperHeroes;
 
 public interface ISuperHeroRepository
 {
-    Task<SuperHero?> GetByIdAsync(HeroId heroId);
+    Task<SuperHero> GetByIdAsync(HeroId heroId);
     Task<IReadOnlyList<SuperHero>> GetAllAsync();
 
     Task AddAsync(SuperHero hero);
