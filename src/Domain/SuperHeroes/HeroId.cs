@@ -5,7 +5,7 @@ namespace Domain.SuperHeroes;
 
 public sealed class HeroId : ValueObject
 {
-    private Guid Value { get; }
+    public Guid Value { get; }
 
     private HeroId(Guid value)
     {
