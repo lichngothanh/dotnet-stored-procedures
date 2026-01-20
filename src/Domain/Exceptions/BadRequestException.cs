@@ -1,6 +1,6 @@
 namespace Domain.Exceptions;
 
-public class BadRequestException : DomainException
+public class BadRequestException : Exception
 {
     public BadRequestException() : base() { }
     public BadRequestException(string message) : base(message) { }

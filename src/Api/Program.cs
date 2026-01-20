@@ -1,8 +1,11 @@
 using Api.Middlewares;
+using Application.Interfaces;
+using Application.Mapping;
 using Domain.SuperHeroes;
 using Infrastructure.Ado.Persistence;
 using Infrastructure.Shared.Abstractions;
 using Infrastructure.Shared.Configurations;
+using Infrastructure.Shared.Implementations;
 using Infrastructure.Shared.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,11 +15,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAutoMapper(config =>
+{
+    config.AddProfile<SuperHeroProfile>();
+});
 
 builder.Services.Configure<DatabaseOptions>(
     builder.Configuration.GetSection(DatabaseOptions.SectionName));
 
+// Register Repository layer
 builder.Services.AddScoped<ISuperHeroRepository, SuperHeroRepository>();
+
+// Register Service layer
+builder.Services.AddScoped<ISuperHeroService, SuperHeroService>();
 
 // Register SqlExecutor helper
 builder.Services.AddScoped<ISqlExecutor, SqlExecutor>();
