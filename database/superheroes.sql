@@ -153,3 +153,101 @@ GO
 SELECT * FROM Teams;
 SELECT * FROM SuperHeroes;
 GO
+
+
+/* =========================
+   GET BY ID
+   ========================= */
+CREATE PROCEDURE sp_SuperHero_GetById
+    @HeroId UNIQUEIDENTIFIER
+AS
+BEGIN
+SELECT *
+FROM SuperHeroes
+WHERE HeroId = @HeroId
+END
+GO
+
+/* =========================
+   GET ALL
+   ========================= */
+CREATE PROCEDURE sp_SuperHero_GetAll
+    AS
+BEGIN
+SELECT *
+FROM SuperHeroes
+END
+GO
+
+/* =========================
+   INSERT
+   ========================= */
+-- CREATE PROCEDURE sp_SuperHero_Insert
+--     @HeroId UNIQUEIDENTIFIER,
+--     @HeroName NVARCHAR(100),
+--     @RealName NVARCHAR(150),
+--     @PowerLevel INT,
+--     @Universe NVARCHAR(20),
+--     @TeamId UNIQUEIDENTIFIER = NULL 
+-- AS
+-- BEGIN
+-- INSERT INTO SuperHeroes
+-- VALUES (@HeroId, @HeroName, @RealName, @PowerLevel, @Universe, @TeamId)
+-- END
+-- GO
+
+-------- NEW VERSION INSERT WITH RETURNING HEROID --------
+CREATE PROCEDURE sp_SuperHero_Insert
+    @HeroName NVARCHAR(100),
+    @RealName NVARCHAR(150),
+    @PowerLevel INT,
+    @Universe NVARCHAR(20),
+    @TeamId UNIQUEIDENTIFIER = NULL 
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @HeroId UNIQUEIDENTIFIER = NEWID();
+
+INSERT INTO SuperHeroes
+(HeroId, HeroName, RealName, PowerLevel, Universe, TeamId)
+VALUES
+    (@HeroId, @HeroName, @RealName, @PowerLevel, @Universe, @TeamId);
+
+SELECT @HeroId AS HeroId;
+END
+GO
+
+/* =========================
+   UPDATE
+   ========================= */
+CREATE PROCEDURE sp_SuperHero_Update
+    @HeroId UNIQUEIDENTIFIER,
+    @HeroName NVARCHAR(100),
+    @RealName NVARCHAR(150),
+    @PowerLevel INT,
+    @Universe NVARCHAR(20)
+AS
+BEGIN
+UPDATE SuperHeroes
+SET HeroName = @HeroName,
+    RealName = @RealName,
+    PowerLevel = @PowerLevel,
+    Universe = @Universe
+WHERE HeroId = @HeroId
+END
+GO
+
+/* =========================
+   ASSIGN TO TEAM
+   ========================= */
+CREATE PROCEDURE sp_SuperHero_AssignToTeam
+    @HeroId UNIQUEIDENTIFIER,
+    @TeamId UNIQUEIDENTIFIER
+AS
+BEGIN
+UPDATE SuperHeroes
+SET TeamId = @TeamId
+WHERE HeroId = @HeroId
+END
+GO

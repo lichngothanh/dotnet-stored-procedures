@@ -4,15 +4,13 @@ using Domain.Exceptions;
 
 namespace Api.Middlewares;
 
-public class GlobalExceptionHandle(RequestDelegate next)
+public class GlobalExceptionHandle(RequestDelegate next, ILogger<GlobalExceptionHandle> logger)
 {
-    private readonly RequestDelegate _next = next;
-
     public async Task InvokeAsync(HttpContext context)
     {
         try
         {
-            await _next(context);
+            await next(context);
         }
         catch (Exception ex)
         {
@@ -20,7 +18,7 @@ public class GlobalExceptionHandle(RequestDelegate next)
         }
     }
 
-    private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
+    private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         context.Response.ContentType = "application/json";
 
@@ -36,12 +34,22 @@ public class GlobalExceptionHandle(RequestDelegate next)
                 statusCode = (int)HttpStatusCode.BadRequest,
                 message = badRequestEx.Message
             },
+            DomainException domainEx => new
+            {
+                statusCode = (int)HttpStatusCode.UnprocessableEntity,
+                message = domainEx.Message
+            },
             _ => new
             {
                 statusCode = (int)HttpStatusCode.InternalServerError,
                 message = "An unexpected error occurred."
             }
         };
+
+        if (response.statusCode == (int)HttpStatusCode.InternalServerError)
+        {
+            logger.LogError(exception, "Unhandled exception occurred: {Message}", exception.Message);
+        }
 
         context.Response.StatusCode = response.statusCode;
 

@@ -15,11 +15,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddAutoMapper(config =>
-{
-    config.AddProfile<SuperHeroProfile>();
-});
-
+builder.Services.AddAutoMapper(
+    cfg => { },
+    typeof(SuperHeroProfile).Assembly
+);
 builder.Services.Configure<DatabaseOptions>(
     builder.Configuration.GetSection(DatabaseOptions.SectionName));
 
