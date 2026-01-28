@@ -12,7 +12,7 @@ public record CreateSuperHeroRequest
     [StringLength(150, MinimumLength = 2, ErrorMessage = "Real name must be between 2 and 150 characters")]
     public string RealName { get; init; } = string.Empty;
     
-    [Range(1, 100, ErrorMessage = "Power level must be between 1 and 100")]
+    [Range(1, 100, ErrorMessage = "Power level must be between 0 and 100")]
     public int PowerLevel { get; init; }
     
     [Required(ErrorMessage = "Universe is required")]

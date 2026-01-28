@@ -1,3 +1,4 @@
+using Api.Extensions;
 using Api.Middlewares;
 using Application.Interfaces;
 using Application.Mapping;
@@ -30,6 +31,9 @@ builder.Services.AddScoped<ISuperHeroService, SuperHeroService>();
 
 // Register SqlExecutor helper
 builder.Services.AddScoped<ISqlExecutor, SqlExecutor>();
+
+// Add ModelState validation filter
+builder.Services.AddModelStateConfig();
 
 var app = builder.Build();
 

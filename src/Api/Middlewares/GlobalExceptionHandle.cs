@@ -1,6 +1,5 @@
-using System.Net;
-using System.Text.Json;
 using Domain.Exceptions;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Middlewares;
 
@@ -20,44 +19,56 @@ public class GlobalExceptionHandle(RequestDelegate next, ILogger<GlobalException
 
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        context.Response.ContentType = "application/json";
+        ProblemDetails problemDetails;
 
-        var response = exception switch
+        switch (exception)
         {
-            NotFoundException notFoundEx => new
-            {
-                statusCode = (int)HttpStatusCode.NotFound,
-                message = notFoundEx.Message
-            },
-            BadRequestException badRequestEx => new
-            {
-                statusCode = (int)HttpStatusCode.BadRequest,
-                message = badRequestEx.Message
-            },
-            DomainException domainEx => new
-            {
-                statusCode = (int)HttpStatusCode.UnprocessableEntity,
-                message = domainEx.Message
-            },
-            _ => new
-            {
-                statusCode = (int)HttpStatusCode.InternalServerError,
-                message = "An unexpected error occurred."
-            }
-        };
+            case NotFoundException ex:
+                problemDetails = new ProblemDetails
+                {
+                    Status = StatusCodes.Status404NotFound,
+                    Title = "Resource not found",
+                    Detail = ex.Message
+                };
+                break;
 
-        if (response.statusCode == (int)HttpStatusCode.InternalServerError)
-        {
-            logger.LogError(exception, "Unhandled exception occurred: {Message}", exception.Message);
+            case BadRequestException ex:
+                problemDetails = new ProblemDetails
+                {
+                    Status = StatusCodes.Status400BadRequest,
+                    Title = "Bad request",
+                    Detail = ex.Message
+                };
+                break;
+
+            case DomainException ex:
+                problemDetails = new ProblemDetails
+                {
+                    Status = StatusCodes.Status422UnprocessableEntity,
+                    Title = "Business rule violated",
+                    Detail = ex.Message
+                };
+                break;
+
+            default:
+                problemDetails = new ProblemDetails
+                {
+                    Status = StatusCodes.Status500InternalServerError,
+                    Title = "Internal server error",
+                    Detail = "An unexpected error occurred."
+                };
+
+                logger.LogError(exception, "Unhandled exception occurred");
+                break;
         }
 
-        context.Response.StatusCode = response.statusCode;
+        problemDetails.Instance = context.Request.Path;
+        problemDetails.Extensions["traceId"] = context.TraceIdentifier;
 
-        var options = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
+        context.Response.StatusCode = problemDetails.Status.Value;
+        context.Response.ContentType = "application/problem+json";
 
-        await context.Response.WriteAsync(JsonSerializer.Serialize(response, options));
+        await context.Response.WriteAsJsonAsync(problemDetails);
     }
+
 }
