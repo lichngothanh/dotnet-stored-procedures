@@ -3,41 +3,69 @@ using Domain.Teams;
 using Infrastructure.Shared.Abstractions;
 using Infrastructure.Shared.Constants;
 using System.Data;
+using Infrastructure.Ado.Helper;
+using Infrastructure.Ado.Parameters;
 using static Infrastructure.Ado.Mapping.SuperHeroMapper;
 namespace Infrastructure.Ado.Persistence;
 
 public class SuperHeroRepository(ISqlExecutor sql) : ISuperHeroRepository
 {
-
-    private readonly ISqlExecutor _sql = sql;
-    
-    public Task AddAsync(SuperHero hero)
+    public async Task<Guid> AddAsync(SuperHero hero)
     {
-        throw new NotImplementedException();
+        var heroId = await sql.ExecuteSingleValueAsync<Guid>(
+            StoredProcedures.SuperHero.Insert,
+            x => x.AddFrom(new SuperHeroInsertParams
+            {
+                HeroName = hero.HeroName.ToString(),
+                RealName = hero.RealName.ToString(),
+                PowerLevel = hero.PowerLevel.Value,
+                Universe = hero.Universe.ToString(),
+                TeamId = hero.TeamId?.Value
+            })
+        );
+
+        return heroId;
     }
 
-    public Task AssignToTeamAsync(HeroId heroId, TeamId teamId)
+    public async Task AssignToTeamAsync(HeroId heroId, TeamId teamId)
     {
-        throw new NotImplementedException();
+        await sql.ExecuteAsync(
+            StoredProcedures.SuperHero.AssignToTeam,
+            x => x.AddFrom(new SuperHeroAssignToTeamParams()
+            {
+                HeroId = heroId.Value,
+                TeamId = teamId.Value
+            })
+        );
     }
 
     public Task<IReadOnlyList<SuperHero>> GetAllAsync()
-    {
-        throw new NotImplementedException();
-    }
+    => sql.ExecuteListAsync(
+        StoredProcedures.SuperHero.GetAll,
+        _ => { },
+        MapToSuperHero
+    );
+    
 
     public Task<SuperHero> GetByIdAsync(HeroId heroId)
-    {
-        return
-            _sql.ExecuteSingleAsync(
-                StoredProcedures.SuperHero.GetById,
-                x => x.Add("@HeroId", SqlDbType.UniqueIdentifier).Value = heroId.Value,
-                MapToSuperHero
-            );
-    }
+    => sql.ExecuteSingleAsync(
+            StoredProcedures.SuperHero.GetById,
+            x => x.Add("@HeroId", SqlDbType.UniqueIdentifier).Value = heroId.Value,
+            MapToSuperHero
+        );
 
-    public Task UpdateAsync(SuperHero hero)
+    public async Task UpdateAsync(SuperHero hero)
     {
-        throw new NotImplementedException();
+        await sql.ExecuteAsync(
+            StoredProcedures.SuperHero.Update,
+            x => x.AddFrom(new SuperHeroUpdateParams()
+            {
+                HeroId = hero.HeroId.Value,
+                HeroName = hero.HeroName.ToString(),
+                RealName = hero.RealName.ToString(),
+                PowerLevel = hero.PowerLevel.Value,
+                Universe = hero.Universe.ToString()
+            })
+        );
     }
 }

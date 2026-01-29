@@ -8,18 +8,30 @@ public class SuperHeroProfile : Profile
 {
     public SuperHeroProfile()
     {
-        CreateMap<SuperHero, SuperHeroResponse>()
-            .ForMember(dest => dest.HeroId, 
-                opt => opt.MapFrom(src => src.HeroId.Value.ToString()))
-            .ForMember(dest => dest.HeroName, 
-                opt => opt.MapFrom(src => src.HeroName.ToString()))
-            .ForMember(dest => dest.RealName, 
-                opt => opt.MapFrom(src => src.RealName.ToString()))
-            .ForMember(dest => dest.PowerLevel, 
-                opt => opt.MapFrom(src => src.PowerLevel.ToString()))
-            .ForMember(dest => dest.Universe, 
-                opt => opt.MapFrom(src => src.Universe.ToString()))
-            .ForMember(dest => dest.TeamId, 
-                opt => opt.MapFrom(src => src.TeamId != null ? src.TeamId.ToString() : null));
+        CreateMap<SuperHero, SuperHeroResponse>() 
+            // Using ForCtorParam
+            
+            // .ForCtorParam("HeroId",
+            //     opt => opt.MapFrom(src => src.HeroId.Value.ToString()))
+            // .ForCtorParam("HeroName",
+            //     opt => opt.MapFrom(src => src.HeroName.ToString()))
+            // .ForCtorParam("RealName",
+            //     opt => opt.MapFrom(src => src.RealName.ToString()))
+            // .ForCtorParam("PowerLevel",
+            //     opt => opt.MapFrom(src => src.PowerLevel.Value))
+            // .ForCtorParam("Universe",
+            //     opt => opt.MapFrom(src => src.Universe.ToString()))
+            // .ForCtorParam("TeamId",
+            //     opt => opt.MapFrom(src => src.TeamId != null ? src.TeamId.ToString() : null));
+            
+            // Or using ConvertUsing
+            .ConvertUsing(src => new SuperHeroResponse(
+                src.HeroId.Value.ToString(),
+                src.HeroName.ToString(),
+                src.RealName.ToString(),
+                src.PowerLevel.Value,
+                src.Universe.ToString(),
+                src.TeamId != null ? src.TeamId.ToString() : null
+            ));
     }
 }
