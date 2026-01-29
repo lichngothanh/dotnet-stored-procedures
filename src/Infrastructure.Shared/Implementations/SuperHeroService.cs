@@ -2,6 +2,7 @@
 using Application.Interfaces;
 using AutoMapper;
 using Domain.Common;
+using Domain.Exceptions;
 using Domain.SuperHeroes;
 using Domain.Teams;
 
@@ -47,5 +48,20 @@ public class SuperHeroService(ISuperHeroRepository superHeroRepository, IMapper 
         );
         
         await superHeroRepository.UpdateAsync(hero);
+    }
+
+    public async Task AssignToTeamAsync(AssignToTeamRequest request)
+    {
+        var hero = await superHeroRepository.GetByIdAsync(HeroId.From(request.HeroId));
+
+        if (hero is null)
+        {
+            throw new DomainException($"Hero with id {request.HeroId} does not exist");
+        }
+        
+        await superHeroRepository.AssignToTeamAsync(
+            HeroId.From(request.HeroId),
+            TeamId.From(request.TeamId)
+        );
     }
 }

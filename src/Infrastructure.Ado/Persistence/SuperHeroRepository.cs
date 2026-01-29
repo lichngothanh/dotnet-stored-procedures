@@ -3,6 +3,8 @@ using Domain.Teams;
 using Infrastructure.Shared.Abstractions;
 using Infrastructure.Shared.Constants;
 using System.Data;
+using Infrastructure.Ado.Helper;
+using Infrastructure.Ado.Parameters;
 using static Infrastructure.Ado.Mapping.SuperHeroMapper;
 namespace Infrastructure.Ado.Persistence;
 
@@ -12,23 +14,29 @@ public class SuperHeroRepository(ISqlExecutor sql) : ISuperHeroRepository
     {
         var heroId = await sql.ExecuteSingleValueAsync<Guid>(
             StoredProcedures.SuperHero.Insert,
-            x =>
+            x => x.AddFrom(new SuperHeroInsertParams
             {
-                x.Add("@HeroName", SqlDbType.NVarChar, 100).Value = hero.HeroName.ToString();
-                x.Add("@RealName", SqlDbType.NVarChar, 150).Value = hero.RealName.ToString();
-                x.Add("@PowerLevel", SqlDbType.Int).Value = hero.PowerLevel.Value;
-                x.Add("@Universe", SqlDbType.NVarChar, 20).Value = hero.Universe.ToString();
-                x.Add("@TeamId", SqlDbType.UniqueIdentifier).Value =
-                    hero.TeamId ?? (object)DBNull.Value;
-            }
+                HeroName = hero.HeroName.ToString(),
+                RealName = hero.RealName.ToString(),
+                PowerLevel = hero.PowerLevel.Value,
+                Universe = hero.Universe.ToString(),
+                TeamId = hero.TeamId?.Value
+            })
         );
 
         return heroId;
     }
 
-    public Task AssignToTeamAsync(HeroId heroId, TeamId teamId)
+    public async Task AssignToTeamAsync(HeroId heroId, TeamId teamId)
     {
-        throw new NotImplementedException();
+        await sql.ExecuteAsync(
+            StoredProcedures.SuperHero.AssignToTeam,
+            x => x.AddFrom(new SuperHeroAssignToTeamParams()
+            {
+                HeroId = heroId.Value,
+                TeamId = teamId.Value
+            })
+        );
     }
 
     public Task<IReadOnlyList<SuperHero>> GetAllAsync()
@@ -46,16 +54,18 @@ public class SuperHeroRepository(ISqlExecutor sql) : ISuperHeroRepository
             MapToSuperHero
         );
 
-    public Task UpdateAsync(SuperHero hero)
-    => sql.ExecuteAsync(
-        StoredProcedures.SuperHero.Update,
-        x =>
-        {
-            x.Add("@HeroId", SqlDbType.UniqueIdentifier).Value = hero.HeroId.Value;
-            x.Add("@HeroName", SqlDbType.NVarChar, 100).Value = hero.HeroName.ToString();
-            x.Add("@RealName", SqlDbType.NVarChar, 150).Value = hero.RealName.ToString();
-            x.Add("@PowerLevel", SqlDbType.Int).Value = hero.PowerLevel.Value;
-            x.Add("@Universe", SqlDbType.NVarChar, 20).Value = hero.Universe.ToString();
-        }
-    );
+    public async Task UpdateAsync(SuperHero hero)
+    {
+        await sql.ExecuteAsync(
+            StoredProcedures.SuperHero.Update,
+            x => x.AddFrom(new SuperHeroUpdateParams()
+            {
+                HeroId = hero.HeroId.Value,
+                HeroName = hero.HeroName.ToString(),
+                RealName = hero.RealName.ToString(),
+                PowerLevel = hero.PowerLevel.Value,
+                Universe = hero.Universe.ToString()
+            })
+        );
+    }
 }

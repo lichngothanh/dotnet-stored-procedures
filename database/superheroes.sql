@@ -251,3 +251,37 @@ SET TeamId = @TeamId
 WHERE HeroId = @HeroId
 END
 GO
+
+-- sp_Team_GetAll
+CREATE PROCEDURE sp_Team_GetAll
+AS
+BEGIN
+    SELECT * 
+    FROM Teams
+END
+Go
+
+-- sp_Team_GetById
+
+CREATE PROCEDURE sp_Team_GetById
+    @TeamId UNIQUEIDENTIFIER
+AS
+BEGIN
+    SELECT *
+    FROM Teams
+    WHERE TeamId = @TeamId
+END
+Go
+
+-- sp_Team_GetTeamsFromUniverse
+
+CREATE PROCEDURE sp_Team_GetTeamsFromUniverse
+    @Universe NVARCHAR(20)
+AS
+BEGIN
+    SELECT *
+    FROM Teams
+    WHERE Universe = @Universe
+END 
+GO
+

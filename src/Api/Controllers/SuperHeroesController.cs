@@ -54,4 +54,16 @@ public class SuperHeroesController(ISuperHeroService superHeroService) : Control
         await superHeroService.UpdateAsync(request);
         return Ok(new { message = "SuperHero updated successfully" });
     }
+
+    [HttpPost("assign-to-team")]
+    public async Task<IActionResult> AssignToTeam([FromBody] AssignToTeamRequest request)
+    {
+        if(!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        
+        await superHeroService.AssignToTeamAsync(request);
+        return Ok(new { message = "SuperHero assigned to team successfully" });
+    }
 }
