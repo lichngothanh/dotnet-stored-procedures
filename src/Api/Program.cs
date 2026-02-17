@@ -1,3 +1,4 @@
+using Api.Extensions;
 using Api.Middlewares;
 using Application.Interfaces;
 using Application.Mapping;
@@ -15,11 +16,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddAutoMapper(config =>
-{
-    config.AddProfile<SuperHeroProfile>();
-});
-
+builder.Services.AddAutoMapper(
+    cfg => { },
+    typeof(SuperHeroProfile).Assembly
+);
 builder.Services.Configure<DatabaseOptions>(
     builder.Configuration.GetSection(DatabaseOptions.SectionName));
 
@@ -31,6 +31,9 @@ builder.Services.AddScoped<ISuperHeroService, SuperHeroService>();
 
 // Register SqlExecutor helper
 builder.Services.AddScoped<ISqlExecutor, SqlExecutor>();
+
+// Add ModelState validation filter
+builder.Services.AddModelStateConfig();
 
 var app = builder.Build();
 

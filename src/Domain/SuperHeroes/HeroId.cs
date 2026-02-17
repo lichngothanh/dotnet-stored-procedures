@@ -18,6 +18,9 @@ public sealed class HeroId : ValueObject
     public static HeroId From(Guid value)
         => new(value);
 
+    public static HeroId NewId()
+        => new(Guid.NewGuid());
+
     protected override IEnumerable<object> GetEqualityComponents()
     {
         yield return Value;

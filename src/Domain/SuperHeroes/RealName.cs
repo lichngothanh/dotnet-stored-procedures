@@ -10,12 +10,15 @@ public sealed class RealName : ValueObject
     private RealName(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            throw new DomainException("RealName cannot be empty");
+            throw new DomainException("Real name is required");
 
         value = value.Trim();
 
+        if (value.Length < 2)
+            throw new DomainException("Real name must be at least 2 characters");
+
         if (value.Length > 150)
-            throw new DomainException("RealName must be 150 characters or less");
+            throw new DomainException("Real name must be 150 characters or less");
 
         Value = value;
     }

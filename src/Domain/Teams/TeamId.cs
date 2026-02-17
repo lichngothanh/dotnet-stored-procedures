@@ -5,7 +5,7 @@ namespace Domain.Teams;
 
 public sealed class TeamId : ValueObject
 {
-    private Guid Value { get; }
+    public Guid Value { get; }
 
     private TeamId(Guid value)
     {

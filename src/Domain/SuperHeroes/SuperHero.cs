@@ -31,8 +31,33 @@ public class SuperHero
         Universe = universe;
     }
     
+    public SuperHero(
+        HeroName heroName,
+        RealName realName,
+        PowerLevel powerLevel,
+        Universe universe)
+    {
+        HeroId = HeroId.NewId();
+        HeroName = heroName;
+        RealName = realName;
+        PowerLevel = powerLevel;
+        Universe = universe;
+    }
+    
     public void AssignToTeam(TeamId teamCode)
     {
         TeamId = teamCode;
+    }
+    
+    public void Update(
+        HeroName heroName,
+        RealName realName,
+        PowerLevel powerLevel,
+        Universe universe)
+    {
+        HeroName = heroName;
+        RealName = realName;
+        PowerLevel = powerLevel;
+        Universe = universe;
     }
 }
